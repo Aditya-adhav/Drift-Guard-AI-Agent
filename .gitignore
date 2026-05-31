@@ -1,0 +1,8 @@
+.terraform/
+__pycache__/
+*.log
+*.tfstate
+*.tfstate.backup
+tfplan
+plan.json
+*.tmp
