@@ -89,4 +89,5 @@ streamlit run app.py
 4. If drift is detected, click **Trigger AI Remediation** to have the AI write the Terraform fix!
 
 ---
-*Built with ❤️ for Agentic Cloud Security.*
+*Built with ❤️.*
+**Made by Aditya Adhav**
