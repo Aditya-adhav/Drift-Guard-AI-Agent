@@ -119,6 +119,28 @@ streamlit run app.py
 
 ---
 
+## 🧪 Testing Drift-Guard (Simulating Drift)
+
+Want to see the AI agent in action? Here is a step-by-step guide to simulating a configuration drift manually:
+
+1. **Provision Infrastructure First**: Ensure your local `main.tf` has been applied to the cloud without any pending changes.
+   ```bash
+   terraform apply -auto-approve
+   ```
+2. **Create Manual Drift (The "Bad Actor")**: 
+   - Log into your [AWS Management Console](https://console.aws.amazon.com/) (or use the AWS CLI).
+   - Navigate to a resource defined in your `main.tf` (for example, a Security Group or an S3 Bucket).
+   - Manually change a property! (e.g., Add a new Inbound Rule, change a description, or add a tag like `Environment = Manual`).
+3. **Run the AI Agent**:
+   - Go back to your terminal and start the app (`streamlit run app.py`).
+   - Click **Scan for Drift**.
+   - The application will detect the exact manual change you just made in the AWS Console.
+4. **Trigger Remediation**: 
+   - Click **Trigger AI Remediation**.
+   - Watch the AI automatically write the Terraform HCL code required to incorporate your manual cloud change back into your local `main.tf` file!
+
+---
+
 <div align="center">
 
 *Built with ❤️ for Agentic Cloud Security.*
