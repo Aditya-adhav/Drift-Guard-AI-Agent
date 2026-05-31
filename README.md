@@ -1,39 +1,63 @@
-# Drift-Guard AI Agent 🛡️
+<div align="center">
 
-Drift-Guard is an **Agentic Cloud Guardian** and digital twin for your Infrastructure as Code (IaC). It continuously monitors your cloud infrastructure for configuration drift using Terraform. When drift is detected, it uses advanced LLM reasoning to categorize the risk (Security, Cost, Neutral) and automatically generates corrected HCL (HashiCorp Configuration Language) code to remediate the drift.
+# 🛡️ Drift-Guard AI Agent
 
-## Features
-- **Continuous Monitoring**: Scans your Terraform state against the live cloud environment.
-- **AI Remediation**: Uses LLMs (OpenAI, Groq, or local models via Ollama) to analyze Terraform plan diffs.
-- **Self-Correcting**: Automatically generates valid HCL code to fix the drift, validating it before proposing the fix.
-- **Human-in-the-Loop**: Review the proposed HCL code via a premium Streamlit UI before applying it or reverting the cloud changes.
+**Agentic Cloud Guardian & Digital Twin for Infrastructure as Code**
+
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Terraform](https://img.shields.io/badge/terraform-1.0+-623CE4.svg)](https://www.terraform.io/)
+[![AWS CLI](https://img.shields.io/badge/AWS-CLI-FF9900.svg)](https://aws.amazon.com/cli/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B.svg)](https://streamlit.io/)
+
+</div>
 
 ---
 
-## 🚀 Getting Started Tutorial
+> **Drift-Guard** continuously monitors your cloud infrastructure for configuration drift using Terraform. When drift is detected, it uses advanced LLM reasoning to categorize the risk (Security, Cost, Neutral) and automatically generates corrected HCL (HashiCorp Configuration Language) code to remediate the drift.
+
+## ✨ Key Features
+
+| Feature | Description |
+| :--- | :--- |
+| 🔍 **Continuous Monitoring** | Scans your local Terraform state against the live cloud environment. |
+| 🤖 **AI Remediation** | Uses LLMs (OpenAI, Groq, or local Ollama models) to analyze `terraform plan` diffs. |
+| 🛠️ **Self-Correcting** | Automatically generates and validates HCL code to fix drift before proposing it. |
+| 🧑‍💻 **Human-in-the-Loop** | Review proposed HCL fixes via a premium Streamlit UI before applying or reverting changes. |
+
+---
+
+## 🚀 Getting Started
 
 Follow these steps to set up the environment, install the necessary tools, and run Drift-Guard.
 
-### 1. Install Prerequisites
+### 1️⃣ Install Prerequisites
 
-#### A. Install Python
+<details>
+<summary><b>A. Install Python</b></summary>
+
 1. Download Python from the [official website](https://www.python.org/downloads/).
-2. Run the installer and **make sure to check "Add Python to PATH"** at the bottom of the installation window.
-3. Verify installation in your terminal:
+2. Run the installer and **check "Add Python to PATH"** at the bottom of the installation window.
+3. Verify installation:
    ```bash
    python --version
    ```
+</details>
 
-#### B. Install Terraform
+<details>
+<summary><b>B. Install Terraform</b></summary>
+
 1. Download Terraform for your OS from [HashiCorp's website](https://developer.hashicorp.com/terraform/downloads).
 2. Extract the executable and add its folder to your system's PATH.
 3. Verify installation:
    ```bash
    terraform --version
    ```
+</details>
 
-#### C. Install AWS CLI & Authenticate
-Since Drift-Guard uses Terraform to check AWS infrastructure, you need the AWS CLI installed and configured.
+<details>
+<summary><b>C. Install AWS CLI & Authenticate</b></summary>
+
+Since Drift-Guard uses Terraform to check AWS infrastructure, you need the AWS CLI installed.
 1. Download the [AWS CLI Installer for Windows](https://awscli.amazonaws.com/AWSCLIV2.msi).
 2. Run the installer.
 3. Open a new terminal and log in using your AWS credentials:
@@ -41,54 +65,64 @@ Since Drift-Guard uses Terraform to check AWS infrastructure, you need the AWS C
    aws configure
    ```
 4. Enter your `AWS Access Key ID`, `AWS Secret Access Key`, `Default region name` (e.g., `us-east-1`), and `Default output format` (e.g., `json`).
+</details>
 
-### 2. Set Up the LLM (Large Language Model)
-Drift-Guard needs an AI model to reason about the infrastructure drift. You have two main options:
+### 2️⃣ Set Up the LLM
 
-**Option A: Cloud Providers (OpenAI, Groq)**
-- Simply get an API key from [OpenAI](https://platform.openai.com/) or [Groq](https://console.groq.com/).
-- You will paste this key directly into the Drift-Guard UI later.
+Drift-Guard needs an AI model to reason about infrastructure drift. You have two main options:
 
-**Option B: Local Open-Source Models (Ollama)**
-- Download and install [Ollama](https://ollama.com/).
-- Run a model locally in your terminal (e.g., Qwen 2.5 Coder):
-  ```bash
-  ollama run qwen2.5-coder:7b
-  ```
-- Leave Ollama running. The base URL for the app will be `http://localhost:11434/v1`.
+> [!TIP]
+> **Option A: Cloud Providers (OpenAI, Groq)**
+> Get an API key from [OpenAI](https://platform.openai.com/) or [Groq](https://console.groq.com/). You will paste this key directly into the app UI later.
 
-### 3. Install Project Dependencies
-Navigate to the Drift-Guard project folder in your terminal and install the required Python libraries:
+> [!TIP]
+> **Option B: Local Open-Source Models (Ollama)**
+> 1. Download and install [Ollama](https://ollama.com/).
+> 2. Run a model locally in your terminal (e.g., Qwen 2.5 Coder):
+>    ```bash
+>    ollama run qwen2.5-coder:7b
+>    ```
+> 3. Leave Ollama running. The base URL for the app will be `http://localhost:11434/v1`.
+
+### 3️⃣ Setup & Run
+
+Navigate to the project folder and install the required Python libraries:
 
 ```bash
 cd c:\Users\adity\OneDrive\Desktop\drift
 pip install -r requirements.txt
 ```
 
-### 4. Initialize Terraform
-Before running the agent, initialize Terraform in your project folder so it downloads the necessary providers (like AWS):
+Initialize Terraform to download the necessary providers (like AWS):
 
 ```bash
 terraform init
 ```
 
-### 5. Run the Drift-Guard Agent
 Launch the beautiful Streamlit web interface:
 
 ```bash
 streamlit run app.py
 ```
 
-### 6. Using the App
-1. The web interface will automatically open in your browser (usually `http://localhost:8501`).
+---
+
+## 🎮 Using the App
+
+1. The web interface will automatically open in your browser (`http://localhost:8501`).
 2. In the **sidebar**, configure your LLM settings:
-   - **LLM API Key**: Enter your OpenAI/Groq key (leave blank or enter a dummy string if using Ollama).
-   - **LLM Base URL**: `https://api.openai.com/v1` (OpenAI), `https://api.groq.com/openai/v1` (Groq), or `http://localhost:11434/v1` (Ollama).
+   - **LLM API Key**: Enter your OpenAI/Groq key (leave blank if using Ollama).
+   - **LLM Base URL**: `https://api.openai.com/v1` (OpenAI) / `https://api.groq.com/openai/v1` (Groq) / `http://localhost:11434/v1` (Ollama).
    - **Model Name**: e.g., `gpt-4o`, `llama3-70b-8192`, or `qwen2.5-coder:7b`.
 3. Click **Scan for Drift** to analyze your AWS environment.
 4. If drift is detected, click **Trigger AI Remediation** to have the AI write the Terraform fix!
 
 ---
-*Built with ❤️.*
+
+<div align="center">
+
+*Built with ❤️ for Agentic Cloud Security.*
 
 **Made by Aditya Adhav**
+
+</div>
