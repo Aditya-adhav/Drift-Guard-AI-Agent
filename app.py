@@ -95,14 +95,56 @@ st.markdown("""
         to { opacity: 1; transform: translateY(0); }
     }
     
+    /* App Background */
+    .stApp {
+        background: radial-gradient(circle at top left, #0f172a, #020617);
+        color: #f8fafc;
+    }
+
     /* Streamlit overrides for better UI */
     .stButton>button {
         border-radius: 8px;
         font-weight: 600;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(30, 41, 59, 0.5);
+        min-height: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .stButton>button:hover {
-        transform: scale(1.02);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Primary Button Glow */
+    .stButton>button[data-baseweb="button"]:has(div>p) {
+        /* Generic button fix if we want to target primary specifically, 
+           Streamlit uses data-testid="baseButton-primary" */
+    }
+    [data-testid="baseButton-primary"] {
+        background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%) !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4) !important;
+        color: #020617 !important;
+    }
+    [data-testid="baseButton-primary"]:hover {
+        box-shadow: 0 6px 20px rgba(0, 242, 254, 0.6) !important;
+    }
+
+    /* Code Text Area */
+    .stTextArea textarea {
+        font-family: 'Consolas', 'Courier New', monospace !important;
+        background: rgba(15, 23, 42, 0.7) !important;
+        border: 1px solid rgba(0, 198, 255, 0.2) !important;
+        color: #e2e8f0 !important;
+        border-radius: 8px;
+    }
+    .stTextArea textarea:focus {
+        border: 1px solid rgba(0, 198, 255, 0.8) !important;
+        box-shadow: 0 0 10px rgba(0, 198, 255, 0.2) !important;
     }
 </style>
 """, unsafe_allow_html=True)

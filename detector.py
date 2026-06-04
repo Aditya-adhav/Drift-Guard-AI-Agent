@@ -186,6 +186,14 @@ class DriftDetector:
                     hcl_code = ""
                 hcl_code = hcl_code.strip()
                 
+                if not hcl_code:
+                    messages.append({"role": "assistant", "content": ai_response})
+                    messages.append({
+                        "role": "user",
+                        "content": "You provided an empty string for 'hcl_code'. You MUST output the complete, valid HCL resource block matching the JSON state, even if you think no changes are needed. NEVER output an empty string."
+                    })
+                    continue
+
                 # Proactively strip markdown block if the model included it despite instructions
                 if hcl_code.startswith("```hcl"):
                     hcl_code = hcl_code[6:]
