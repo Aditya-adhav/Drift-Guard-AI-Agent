@@ -3,7 +3,7 @@ import time
 import os
 from detector import DriftDetector
 
-# Page configuration for premium aesthetic
+# Page configuration
 st.set_page_config(
     page_title="Drift-Guard | Agentic Cloud Guardian",
     page_icon="🛡️",
@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for a dark-mode premium look
+# CSS
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600&display=swap');
