@@ -1,0 +1,17 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
+.terraform
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+drift_guard_debug.log
+*.tmp
