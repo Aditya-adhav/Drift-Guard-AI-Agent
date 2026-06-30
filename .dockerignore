@@ -9,9 +9,18 @@ env/
 venv/
 .env
 .venv
+
+# Ignore all terraform infrastructure and state files!
+# We want the Docker image to only contain the Python app.
+*.tf
+*.tfvars
 .terraform
 .terraform.lock.hcl
 terraform.tfstate
 terraform.tfstate.backup
-drift_guard_debug.log
+plan.json
+tfplan
 *.tmp
+
+# Ignore logs
+drift_guard_debug.log

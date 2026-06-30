@@ -52,6 +52,14 @@ RULES:
         -detailed-exitcode returns 0 (success/no diff), 1 (error), 2 (success/diff)
         """
         try:
+            # Initialize Terraform dynamically in the container
+            subprocess.run(
+                ["terraform", "init"],
+                cwd=self.tf_dir,
+                capture_output=True,
+                text=True
+            )
+            
             result = subprocess.run(
                 ["terraform", "plan", "-detailed-exitcode", "-no-color", "-out=tfplan"],
                 cwd=self.tf_dir,

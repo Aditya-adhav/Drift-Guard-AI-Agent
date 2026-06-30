@@ -4,6 +4,7 @@ FROM python:3.10-slim
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV TF_DATA_DIR=/tmp/.terraform
 
 # Install system dependencies and Terraform
 # We use Terraform 1.5.7 (which is the last MPL licensed version before the BSL change)
@@ -27,9 +28,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application
 COPY . .
-
-# Initialize Terraform for the default project
-RUN terraform init
 
 # Expose port for Streamlit
 EXPOSE 8501
