@@ -102,7 +102,7 @@ terraform init
 Launch the beautiful Streamlit web interface:
 
 ```bash
-streamlit run app.py
+streamlit run src/app.py
 ```
 
 ---
@@ -149,7 +149,7 @@ You can run Drift-Guard as an isolated Docker container and scan any local Terra
 
 Want to see the AI agent in action? Here is a step-by-step guide to simulating a configuration drift manually:
 
-1. **Provision Infrastructure First**: Ensure your local `main.tf` has been applied to the cloud without any pending changes.
+1. **Provision Infrastructure First**: Navigate into the `example/` directory and ensure the sample `main.tf` has been applied to the cloud without any pending changes.
    ```bash
    terraform apply -auto-approve
    ```
@@ -158,7 +158,7 @@ Want to see the AI agent in action? Here is a step-by-step guide to simulating a
    - Navigate to a resource defined in your `main.tf` (for example, a Security Group or an S3 Bucket).
    - Manually change a property! (e.g., Add a new Inbound Rule, change a description, or add a tag like `Environment = Manual`).
 3. **Run the AI Agent**:
-   - Go back to your terminal and start the app (`streamlit run app.py`).
+   - Go back to your terminal and start the app (`streamlit run src/app.py`).
    - Click **Scan for Drift**.
    - The application will detect the exact manual change you just made in the AWS Console.
 4. **Trigger Remediation**: 

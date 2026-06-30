@@ -12,6 +12,8 @@ venv/
 
 # Ignore all terraform infrastructure and state files!
 # We want the Docker image to only contain the Python app.
+example/
+tests/
 *.tf
 *.tfvars
 .terraform
