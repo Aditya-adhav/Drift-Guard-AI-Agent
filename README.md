@@ -89,14 +89,17 @@ Drift-Guard needs an AI model to reason about infrastructure drift. You have two
 Navigate to the project folder and install the required Python libraries:
 
 ```bash
-cd c:\Users\adity\OneDrive\Desktop\drift
+git clone https://github.com/Aditya-adhav/Drift-Guard-AI-Agent.git
+cd Drift-Guard-AI-Agent
 pip install -r requirements.txt
 ```
 
-Initialize Terraform to download the necessary providers (like AWS):
+Initialize the sample Terraform project to download the necessary providers (like AWS):
 
 ```bash
+cd example
 terraform init
+cd ..
 ```
 
 Launch the beautiful Streamlit web interface:
