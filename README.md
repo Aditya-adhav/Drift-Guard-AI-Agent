@@ -107,6 +107,32 @@ streamlit run app.py
 
 ---
 
+## 🐳 Running via Docker (Portable Tool)
+
+You can run Drift-Guard as an isolated Docker container and scan any local Terraform project without installing Python or Terraform on your host machine!
+
+1. **Build the Image:**
+   ```bash
+   docker build -t drift-guard-agent:latest .
+   ```
+
+2. **Run the Container (Mounting your code):**
+   Navigate to the folder containing your Terraform code, and run:
+   ```bash
+   docker run -p 8501:8501 \
+     -v ${PWD}:/app \
+     -e OPENAI_API_KEY="your_api_key_here" \
+     -e AWS_ACCESS_KEY_ID="your_aws_access_key" \
+     -e AWS_SECRET_ACCESS_KEY="your_aws_secret_key" \
+     -e AWS_DEFAULT_REGION="us-east-1" \
+     drift-guard-agent:latest
+   ```
+   > **Note on Local LLMs (Ollama):** If you are using Ollama, set `-e LLM_BASE_URL="http://host.docker.internal:11434/v1"`, pass a dummy API key, and set `-e LLM_MODEL` to your local model name.
+
+3. Open `http://localhost:8501` in your browser. The agent will automatically initialize Terraform and scan the code you mounted!
+
+---
+
 ## 🎮 Using the App
 
 1. The web interface will automatically open in your browser (`http://localhost:8501`).

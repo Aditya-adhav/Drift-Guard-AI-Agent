@@ -19,6 +19,7 @@ Enhancing how the AI interacts with the user and the code.
 ## Phase 3: Operationalizing the Agent
 Making the tool something that can run in the background in a production environment.
 
+- [x] **Dockerization:** Containerize the application including its Python and Terraform dependencies so it can be deployed consistently anywhere.
 - [ ] **Headless/Background Scanning:** Move away from the Streamlit UI's `time.sleep` loop for continuous scanning. Implement a proper background scheduler (like Celery or APScheduler) that runs as a daemon.
 - [ ] **Alerting & Notifications:** Add Webhook support so when drift is detected, it sends a Slack, Microsoft Teams, or Discord message with a summary of the drift and a link to the dashboard to approve the AI's fix.
 - [ ] **Audit Logging:** Keep a local SQLite database of all historical drifts, AI categorizations, and which user approved or rejected the AI's fix.
