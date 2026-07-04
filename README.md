@@ -26,113 +26,45 @@
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start (Docker)
 
-Follow these steps to set up the environment, install the necessary tools, and run Drift-Guard.
+The easiest and recommended way to run Drift-Guard is using our official Docker image. This means you do **not** need to install Python or Terraform on your host machine!
 
-### 1️⃣ Install Prerequisites
+### 1️⃣ Prerequisites
 
-<details>
-<summary><b>A. Install Python</b></summary>
+1. **Docker**: Ensure Docker is installed and running on your machine.
+2. **AWS Credentials**: Have your AWS Access Key ID and Secret Access Key ready.
+3. **An LLM**: You need an AI model to reason about the drift.
+   - **Option A (Cloud)**: Get an API key from [OpenAI](https://platform.openai.com/) or [Groq](https://console.groq.com/).
+   - **Option B (Local)**: Install [Ollama](https://ollama.com/) and run a local model (e.g., `ollama run qwen2.5-coder:7b`).
 
-1. Download Python from the [official website](https://www.python.org/downloads/).
-2. Run the installer and **check "Add Python to PATH"** at the bottom of the installation window.
-3. Verify installation:
-   ```bash
-   python --version
-   ```
-</details>
+### 2️⃣ Pull & Run
 
-<details>
-<summary><b>B. Install Terraform</b></summary>
-
-1. Download Terraform for your OS from [HashiCorp's website](https://developer.hashicorp.com/terraform/downloads).
-2. Extract the executable and add its folder to your system's PATH.
-3. Verify installation:
-   ```bash
-   terraform --version
-   ```
-</details>
-
-<details>
-<summary><b>C. Install AWS CLI & Authenticate</b></summary>
-
-Since Drift-Guard uses Terraform to check AWS infrastructure, you need the AWS CLI installed.
-1. Download the [AWS CLI Installer for Windows](https://awscli.amazonaws.com/AWSCLIV2.msi).
-2. Run the installer.
-3. Open a new terminal and log in using your AWS credentials:
-   ```bash
-   aws configure
-   ```
-4. Enter your `AWS Access Key ID`, `AWS Secret Access Key`, `Default region name` (e.g., `us-east-1`), and `Default output format` (e.g., `json`).
-</details>
-
-### 2️⃣ Set Up the LLM
-
-Drift-Guard needs an AI model to reason about infrastructure drift. You have two main options:
-
-> [!TIP]
-> **Option A: Cloud Providers (OpenAI, Groq)**
-> Get an API key from [OpenAI](https://platform.openai.com/) or [Groq](https://console.groq.com/). You will paste this key directly into the app UI later.
-
-> [!TIP]
-> **Option B: Local Open-Source Models (Ollama)**
-> 1. Download and install [Ollama](https://ollama.com/).
-> 2. Run a model locally in your terminal (e.g., Qwen 2.5 Coder):
->    ```bash
->    ollama run qwen2.5-coder:7b
->    ```
-> 3. Leave Ollama running. The base URL for the app will be `http://localhost:11434/v1`.
-
-### 3️⃣ Setup & Run
-
-Navigate to the project folder and install the required Python libraries:
+Navigate to any folder containing your Terraform code, and run the following command to pull and start the agent:
 
 ```bash
-git clone https://github.com/Aditya-adhav/Drift-Guard-AI-Agent.git
-cd Drift-Guard-AI-Agent
-pip install -r requirements.txt
+docker run -p 8501:8501 \
+  -v ${PWD}:/app \
+  -e OPENAI_API_KEY="your_api_key_here" \
+  -e AWS_ACCESS_KEY_ID="your_aws_access_key" \
+  -e AWS_SECRET_ACCESS_KEY="your_aws_secret_key" \
+  -e AWS_DEFAULT_REGION="us-east-1" \
+  aditya040305/drift-guard-agent:latest
 ```
 
-Initialize the sample Terraform project to download the necessary providers (like AWS):
+> **Note on Local LLMs (Ollama):** If you are using Ollama, set `-e LLM_BASE_URL="http://host.docker.internal:11434/v1"`, pass a dummy API key, and set `-e LLM_MODEL` to your local model name.
 
-```bash
-cd example
-terraform init
-cd ..
-```
+That's it! Open `http://localhost:8501` in your browser. The agent will automatically initialize Terraform and scan the code you mounted!
 
-Launch the beautiful Streamlit web interface:
+<details>
+<summary><b>🛠️ Advanced: Running Locally (From Source)</b></summary>
 
-```bash
-streamlit run src/app.py
-```
-
----
-
-## 🐳 Running via Docker (Portable Tool)
-
-You can run Drift-Guard as an isolated Docker container and scan any local Terraform project without installing Python or Terraform on your host machine!
-
-1. **Build the Image:**
-   ```bash
-   docker build -t drift-guard-agent:latest .
-   ```
-
-2. **Run the Container (Mounting your code):**
-   Navigate to the folder containing your Terraform code, and run:
-   ```bash
-   docker run -p 8501:8501 \
-     -v ${PWD}:/app \
-     -e OPENAI_API_KEY="your_api_key_here" \
-     -e AWS_ACCESS_KEY_ID="your_aws_access_key" \
-     -e AWS_SECRET_ACCESS_KEY="your_aws_secret_key" \
-     -e AWS_DEFAULT_REGION="us-east-1" \
-     drift-guard-agent:latest
-   ```
-   > **Note on Local LLMs (Ollama):** If you are using Ollama, set `-e LLM_BASE_URL="http://host.docker.internal:11434/v1"`, pass a dummy API key, and set `-e LLM_MODEL` to your local model name.
-
-3. Open `http://localhost:8501` in your browser. The agent will automatically initialize Terraform and scan the code you mounted!
+If you prefer not to use Docker, you can run the agent locally:
+1. Install **Python 3.8+**, **Terraform**, and the **AWS CLI**.
+2. Clone the repository: `git clone https://github.com/Aditya-adhav/Drift-Guard-AI-Agent.git`
+3. Install dependencies: `pip install -r requirements.txt`
+4. Run the app: `streamlit run src/app.py`
+</details>
 
 ---
 
