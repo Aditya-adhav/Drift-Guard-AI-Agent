@@ -171,7 +171,7 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("### 📝 System Prompt")
-    prompt_path = os.path.join(tf_dir, "system_prompt.md")
+    prompt_path = os.path.join(os.path.dirname(__file__), "system_prompt.md")
     
     if os.path.exists(prompt_path):
         with open(prompt_path, "r") as f:
