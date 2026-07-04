@@ -43,28 +43,23 @@ The easiest and recommended way to run Drift-Guard is using our official Docker 
 Navigate to any folder containing your Terraform code, and run the following command to pull and start the agent:
 
 ```bash
-docker run -p 8501:8501 \
-  -v ${PWD}:/app \
-  -e OPENAI_API_KEY="your_api_key_here" \
-  -e AWS_ACCESS_KEY_ID="your_aws_access_key" \
-  -e AWS_SECRET_ACCESS_KEY="your_aws_secret_key" \
-  -e AWS_DEFAULT_REGION="us-east-1" \
-  aditya040305/drift-guard-agent:latest
+docker run -p 8501:8501 -v ${PWD}:/app -e OPENAI_API_KEY="your_api_key_here" -e AWS_ACCESS_KEY_ID="your_aws_access_key" -e AWS_SECRET_ACCESS_KEY="your_aws_secret_key" -e AWS_DEFAULT_REGION="us-east-1" aditya040305/drift-guard-agent:latest
 ```
 
 > **Note on Local LLMs (Ollama):** If you are using Ollama, set `-e LLM_BASE_URL="http://host.docker.internal:11434/v1"`, pass a dummy API key, and set `-e LLM_MODEL` to your local model name.
 
 That's it! Open `http://localhost:8501` in your browser. The agent will automatically initialize Terraform and scan the code you mounted!
 
-<details>
-<summary><b>🛠️ Advanced: Running Locally (From Source)</b></summary>
+---
 
-If you prefer not to use Docker, you can run the agent locally:
+## 🛠️ Alternative: Running Locally (From Source)
+
+If you prefer not to use Docker, you can run the agent locally on your machine:
 1. Install **Python 3.8+**, **Terraform**, and the **AWS CLI**.
 2. Clone the repository: `git clone https://github.com/Aditya-adhav/Drift-Guard-AI-Agent.git`
-3. Install dependencies: `pip install -r requirements.txt`
-4. Run the app: `streamlit run src/app.py`
-</details>
+3. Navigate to the project: `cd Drift-Guard-AI-Agent`
+4. Install dependencies: `pip install -r requirements.txt`
+5. Run the app: `streamlit run src/app.py`
 
 ---
 
