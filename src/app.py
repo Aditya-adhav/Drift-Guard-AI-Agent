@@ -3,6 +3,8 @@ import time
 import os
 from detector import DriftDetector
 
+VERSION = "1.0.1"
+
 # Page configuration
 st.set_page_config(
     page_title="Drift-Guard | Agentic Cloud Guardian",
@@ -150,10 +152,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Application Header
-st.markdown("""
+st.markdown(f"""
 <div class='hero-container'>
     <h1 class='hero-title'>Drift-Guard</h1>
-    <p class='hero-subtitle'>Agentic Digital Twin for Infrastructure as Code</p>
+    <p class='hero-subtitle'>Agentic Digital Twin for Infrastructure as Code <span class='badge badge-neutral' style='font-size: 0.8rem; margin-left: 10px; vertical-align: middle;'>v{VERSION}</span></p>
 </div>
 """, unsafe_allow_html=True)
 

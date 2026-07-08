@@ -266,11 +266,53 @@ RULES:
 
     def apply_fix(self, hcl_code: str, target_file: str = "main.tf"):
         """
-        Apply: Overwrites local file with corrected HCL.
+        Apply: Safely replaces the corresponding block in the local file with corrected HCL.
         """
+        import re
         target_path = os.path.join(self.tf_dir, target_file)
-        with open(target_path, "w") as f:
-            f.write(hcl_code)
+        
+        if not os.path.exists(target_path) or os.path.getsize(target_path) == 0:
+            with open(target_path, "w", encoding="utf-8") as f:
+                f.write(hcl_code)
+            return
+
+        # Try to extract the block signature (e.g. resource "aws_s3_bucket" "my_bucket")
+        match = re.search(r'((?:resource|data|module)\s+"[^"]+"\s+"[^"]+")\s*\{', hcl_code)
+        if not match:
+            raise ValueError("Could not parse resource signature from generated HCL code.")
+            
+        block_signature = match.group(1).strip()
+        
+        with open(target_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            
+        start_idx = content.find(block_signature)
+        if start_idx == -1:
+            # Block not found, append it
+            with open(target_path, "a", encoding="utf-8") as f:
+                f.write("\n\n" + hcl_code)
+            return
+            
+        # Find the matching closing brace
+        brace_count = 0
+        end_idx = -1
+        in_block = False
+        for i in range(start_idx, len(content)):
+            if content[i] == '{':
+                brace_count += 1
+                in_block = True
+            elif content[i] == '}':
+                brace_count -= 1
+                if in_block and brace_count == 0:
+                    end_idx = i + 1
+                    break
+                    
+        if end_idx != -1:
+            new_content = content[:start_idx] + hcl_code + content[end_idx:]
+            with open(target_path, "w", encoding="utf-8") as f:
+                f.write(new_content)
+        else:
+            raise ValueError("Malformed HCL in target file; could not find closing brace.")
 
     def revert_infra(self) -> Tuple[bool, str]:
         """
