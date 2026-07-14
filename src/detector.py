@@ -120,6 +120,30 @@ RULES:
             elif os.path.exists(main_tf_path):
                 os.remove(main_tf_path)
 
+    def _redact_sensitive_data(self, data: Dict) -> Dict:
+        """
+        Recursively traverse the dictionary and redact values of sensitive keys.
+        """
+        sensitive_keywords = ['password', 'secret', 'token', 'key', 'cert', 'credential', 'auth']
+        
+        if not isinstance(data, dict):
+            return data
+            
+        redacted_data = {}
+        for k, v in data.items():
+            is_sensitive = any(keyword in k.lower() for keyword in sensitive_keywords)
+            
+            if is_sensitive and v is not None and str(v).strip() != "":
+                redacted_data[k] = "***REDACTED***"
+            elif isinstance(v, dict):
+                redacted_data[k] = self._redact_sensitive_data(v)
+            elif isinstance(v, list):
+                redacted_data[k] = [self._redact_sensitive_data(item) if isinstance(item, dict) else item for item in v]
+            else:
+                redacted_data[k] = v
+                
+        return redacted_data
+
     def analyze_and_remediate(self, plan_output: str, max_retries: int = 3) -> Optional[Dict]:
         """
         Analyze & Reason & Act: Uses OpenAI to categorize drift and generate corrected HCL code.
@@ -158,6 +182,7 @@ RULES:
                             res_addr = rc.get('address')
                             # Sanitize nulls and empty values to help AI
                             sanitized = {k: v for k, v in before_state.items() if v is not None and v != [] and v != {}}
+                            sanitized = self._redact_sensitive_data(sanitized)
                             cloud_state_context += f"\\nJSON representation of {res_addr} in the cloud:\\n```json\\n{json.dumps(sanitized, indent=2)}\\n```\\n"
                         else:
                             logf.write(f"before_state is missing or None.\n")

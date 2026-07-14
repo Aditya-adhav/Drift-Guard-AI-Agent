@@ -5,7 +5,7 @@ This roadmap outlines the optimal path for scaling Drift-Guard from a prototype 
 ## Phase 1: Core Robustness & Privacy (Immediate Next Steps)
 These are the most critical features to ensure the app is safe, reliable, and handles real-world Terraform environments.
 
-- [ ] **Data Sanitization & Redaction:** Implement a filtering mechanism in `detector.py` to strip out sensitive keys (e.g., `password`, `secret_key`, `token`) from the Terraform JSON state before sending it to the LLM.
+- `[x]` **Data Sanitization & Redaction:** Implement a filtering mechanism in `detector.py` to strip out sensitive keys (e.g., `password`, `secret_key`, `token`) from the Terraform JSON state before sending it to the LLM.
 - [ ] **Multi-File Support:** Currently, the app assumes all code is in `main.tf`. Real projects use multiple files (`variables.tf`, `outputs.tf`, modules, etc.). Update the AI prompt to read the entire directory and allow the AI to specify *which* file needs the fix.
 - [ ] **Git Integration (Pull Requests):** Instead of immediately overwriting the local file, integrate with Git (via `GitPython`) or GitHub API to create a new branch and raise a Pull Request with the AI's proposed HCL fix. This aligns perfectly with GitOps best practices.
 
