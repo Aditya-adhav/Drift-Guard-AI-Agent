@@ -3,7 +3,7 @@ import time
 import os
 from detector import DriftDetector
 
-VERSION = "1.1.0"
+VERSION = "1.0.2"
 
 # Page configuration
 st.set_page_config(
