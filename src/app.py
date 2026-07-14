@@ -3,7 +3,7 @@ import time
 import os
 from detector import DriftDetector
 
-VERSION = "1.0.2"
+VERSION = "1.0.3"
 
 # Page configuration
 st.set_page_config(
@@ -240,9 +240,10 @@ def analyze():
             st.session_state.error_msg = "Maximum retries reached without generating valid HCL."
 
 def apply_fix():
-    with st.spinner("Applying corrected HCL to main.tf..."):
+    target_file = st.session_state.analysis_result.get("target_file", "main.tf")
+    with st.spinner(f"Applying corrected HCL to {target_file}..."):
         hcl_code = st.session_state.get("edited_hcl", st.session_state.analysis_result.get("hcl_code"))
-        detector.apply_fix(hcl_code)
+        detector.apply_fix(hcl_code, target_file=target_file)
         time.sleep(1) # Fake delay for effect
         st.session_state.step = "SYNCED"
 
@@ -314,6 +315,7 @@ elif st.session_state.step == "REVIEW_FIX":
     cat = st.session_state.analysis_result.get("category", "Neutral")
     exp = st.session_state.analysis_result.get("explanation", "No explanation provided.")
     code = st.session_state.analysis_result.get("hcl_code", "")
+    target_file = st.session_state.analysis_result.get("target_file", "main.tf")
     
     col1, col2 = st.columns([1, 2])
     
@@ -328,12 +330,12 @@ elif st.session_state.step == "REVIEW_FIX":
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("### Human-in-the-Loop")
-        st.info("Please review the proposed HCL code fix. Applying this fix will overwrite the local `main.tf` file to align it with the current cloud state.")
+        st.info(f"Please review the proposed HCL code fix. Applying this fix will overwrite `{target_file}` to align it with the current cloud state.")
         
         # Action Buttons
         a_col, r_col, c_col = st.columns(3)
         with a_col:
-            if st.button("📝 Update Local Code", help="Accept AI fix and update main.tf", use_container_width=True, type="primary"):
+            if st.button("📝 Update Local Code", help=f"Accept AI fix and update {target_file}", use_container_width=True, type="primary"):
                 apply_fix()
                 st.rerun()
         with r_col:
@@ -346,7 +348,7 @@ elif st.session_state.step == "REVIEW_FIX":
                 st.rerun()
 
     with col2:
-        st.markdown("### Proposed HCL Fix")
+        st.markdown(f"### Proposed HCL Fix (`{target_file}`)")
         st.text_area("You can manually edit the AI's proposed fix before applying:", value=code, height=400, key="edited_hcl")
 
 elif st.session_state.step == "AI_FAILED":

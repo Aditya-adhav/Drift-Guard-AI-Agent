@@ -36,14 +36,14 @@ CRITICAL INSTRUCTIONS:
 4. Convert the JSON state back into HCL blocks (e.g. converting nested JSON arrays into Terraform blocks like `ingress {}`).
 
 RULES:
-1. Output ONLY valid JSON with exactly these keys: "category", "explanation", "hcl_code".
 2. "category" must be: "Security Risk", "Cost Increase", or "Neutral".
-3. "hcl_code" MUST be a String formatted as HashiCorp Configuration Language (HCL) syntax. Do NOT output a JSON object here.
-4. The `hcl_code` string must contain the complete, valid resource block matching the JSON state. You MUST output the entire resource block, even if you think only a small change is needed. NEVER output an empty string.
-5. If an item (like an `ingress` rule) exists in the old `main.tf` but is MISSING from the JSON state, you MUST DELETE it from your generated `hcl_code`.
-6. Do NOT include read-only or computed attributes like `id`, `arn`, `owner_id`, or `version` in the generated HCL string.
-7. Use the EXACT string, integer, or boolean values shown for the `REMOTE_STATE` in the plan. Do NOT hallucinate values.
-8. Do NOT include `provider` blocks.
+3. "target_file" must be: The specific filename where this HCL block belongs (e.g. "main.tf", "variables.tf"). If the resource is entirely new and you think it should be isolated, provide a new filename (e.g. "new_resource.tf").
+4. "hcl_code" MUST be a String formatted as HashiCorp Configuration Language (HCL) syntax. Do NOT output a JSON object here.
+5. The `hcl_code` string must contain the complete, valid resource block matching the JSON state. You MUST output the entire resource block, even if you think only a small change is needed. NEVER output an empty string.
+6. If an item (like an `ingress` rule) exists in the old code but is MISSING from the JSON state, you MUST DELETE it from your generated `hcl_code`.
+7. Do NOT include read-only or computed attributes like `id`, `arn`, `owner_id`, or `version` in the generated HCL string.
+8. Use the EXACT string, integer, or boolean values shown for the `REMOTE_STATE` in the plan. Do NOT hallucinate values.
+9. Do NOT include `provider` blocks.
 """
     def run_terraform_plan(self) -> Tuple[int, str]:
         """
@@ -82,19 +82,19 @@ RULES:
         except Exception as e:
             return 1, str(e)
             
-    def validate_hcl(self, hcl_code: str) -> Tuple[bool, str]:
+    def validate_hcl(self, hcl_code: str, target_file: str = "main.tf") -> Tuple[bool, str]:
         """
-        Self-Correct: Writes temporary HCL code to main.tf and runs terraform validate.
+        Self-Correct: Writes temporary HCL code to target_file and runs terraform validate.
         """
-        main_tf_path = os.path.join(self.tf_dir, "main.tf")
+        target_tf_path = os.path.join(self.tf_dir, target_file)
         original_content = None
         
-        if os.path.exists(main_tf_path):
-            with open(main_tf_path, "r", encoding="utf-8") as f:
+        if os.path.exists(target_tf_path):
+            with open(target_tf_path, "r", encoding="utf-8") as f:
                 original_content = f.read()
                 
         try:
-            with open(main_tf_path, "w", encoding="utf-8") as f:
+            with open(target_tf_path, "w", encoding="utf-8") as f:
                 f.write(hcl_code)
                 
             # Run without -json to get human readable errors which are better for LLMs
@@ -115,10 +115,10 @@ RULES:
             return False, str(e)
         finally:
             if original_content is not None:
-                with open(main_tf_path, "w", encoding="utf-8") as f:
+                with open(target_tf_path, "w", encoding="utf-8") as f:
                     f.write(original_content)
-            elif os.path.exists(main_tf_path):
-                os.remove(main_tf_path)
+            elif os.path.exists(target_tf_path):
+                os.remove(target_tf_path)
 
     def _redact_sensitive_data(self, data: Dict) -> Dict:
         """
@@ -156,12 +156,14 @@ RULES:
         if not self.client:
             self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
             
-        # Read current main.tf content
-        current_hcl = ""
-        main_tf_path = os.path.join(self.tf_dir, "main.tf")
-        if os.path.exists(main_tf_path):
-            with open(main_tf_path, "r", encoding="utf-8") as f:
-                current_hcl = f.read()
+        # Read all .tf files for context
+        import glob
+        all_hcl_context = ""
+        tf_files = glob.glob(os.path.join(self.tf_dir, "*.tf"))
+        for tf_file in tf_files:
+            file_name = os.path.basename(tf_file)
+            with open(tf_file, "r", encoding="utf-8") as f:
+                all_hcl_context += f"--- {file_name} ---\n```hcl\n{f.read()}\n```\n\n"
 
         # Extract Cloud JSON State
         cloud_state_context = ""
@@ -194,7 +196,7 @@ RULES:
             with open(os.path.join(self.tf_dir, "drift_guard_debug.log"), "a", encoding="utf-8") as logf:
                 logf.write(f"Exception extracting JSON state: {e}\n{traceback.format_exc()}\n")
 
-        user_content = f"Here is the current main.tf code:\\n```hcl\\n{current_hcl}\\n```\\n\\nHere is the terraform plan output:\\n\\n{plan_output}\\n\\n{cloud_state_context}"
+        user_content = f"Here is the current local Terraform codebase:\\n{all_hcl_context}\\nHere is the terraform plan output:\\n\\n{plan_output}\\n\\n{cloud_state_context}"
         
         with open(os.path.join(self.tf_dir, "drift_guard_debug.log"), "a", encoding="utf-8") as logf:
             logf.write(f"--- Prompt sent to AI ---\n{user_content}\n-----------------------\n")
@@ -255,11 +257,13 @@ RULES:
                 
                 data["hcl_code"] = hcl_code
                 
+                target_file = data.get("target_file", "main.tf")
+                
                 with open(os.path.join(self.tf_dir, "drift_guard_debug.log"), "a", encoding="utf-8") as logf:
-                    logf.write(f"Generated HCL Code:\n{hcl_code}\n\n")
+                    logf.write(f"Generated HCL Code for {target_file}:\n{hcl_code}\n\n")
                 
                 # Self-Correct: Validate HCL code
-                is_valid, validation_output = self.validate_hcl(hcl_code)
+                is_valid, validation_output = self.validate_hcl(hcl_code, target_file)
                 
                 with open(os.path.join(self.tf_dir, "drift_guard_debug.log"), "a", encoding="utf-8") as logf:
                     logf.write(f"Validation Result: {is_valid}, {validation_output}\n")
@@ -284,7 +288,7 @@ RULES:
 
                 messages.append({
                     "role": "user",
-                    "content": f"An error occurred while parsing your response: {str(e)}. Please ensure you return valid JSON containing exactly the keys 'category', 'explanation', and 'hcl_code'."
+                    "content": f"An error occurred while parsing your response: {str(e)}. Please ensure you return valid JSON containing exactly the keys 'category', 'explanation', 'target_file', and 'hcl_code'."
                 })
                 
         return None
